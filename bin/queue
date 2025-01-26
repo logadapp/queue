@@ -1,0 +1,22 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+use Symfony\Component\Console\Application;
+
+// Include the composer autoloader
+require __DIR__ . '/../vendor/autoload.php';
+
+$console = new Application('LogadApp Queue', '1.0.0');
+
+try {
+	$console->addCommands([
+		new \LogadApp\Queue\Console\WorkCommand()
+	]);
+
+    $console->run();
+
+} catch (Exception $e) {
+    print($e->getMessage());
+}
