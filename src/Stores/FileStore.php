@@ -38,26 +38,26 @@ final class FileStore implements StoreInterface
 	public function next(string $queue): ?array
 	{
 		$file = $this->getFilePath($queue);
+		
+		if (!file_exists($file) || filesize($file) === 0) return null;
 
 		$lines = file($file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
 		if (empty($lines)) return null;
 
 		$line = array_shift($lines);
-        file_put_contents($file, implode(PHP_EOL, $lines));
+		file_put_contents($file, implode(PHP_EOL, $lines));
 
 		return json_decode($line, true);
 	}
 
-	public function retry(string $queue, Job $job): void
+	public function retry(string $queue, string $payload): string
 	{
-		$this->delete($queue, $job->id);
-
-		$this->add($queue, $job);
+		return $this->add($queue, $payload);
 	}
 
 	public function delete(string $queue, string $uid): void
 	{
-		// No-op for file storage
+		//
 	}
 
 	private function getFilePath(string $queue): string
