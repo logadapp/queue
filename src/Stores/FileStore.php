@@ -68,4 +68,17 @@ final class FileStore implements StoreInterface
 
 		return $file;
 	}
+
+	// list jobs for debug
+	public function listJobs(string $queue): array
+	{
+		$file = $this->getFilePath($queue);
+
+		if (!file_exists($file) || filesize($file) === 0) {
+			return [];
+		}
+
+		$lines = file($file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+		return array_map(fn($line) => json_decode($line, true), $lines);
+	}
 }
