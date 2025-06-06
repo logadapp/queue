@@ -3,20 +3,21 @@
 
 declare(strict_types=1);
 
+use LogadApp\Queue\Console\WorkCommand;
 use Symfony\Component\Console\Application;
 
 // Include the composer autoloader
 require __DIR__ . '/../vendor/autoload.php';
 
-$console = new Application('LogadApp Queue', '1.0.0');
+$console = new Application('LogadApp\Queue', '1.0.0');
 
 try {
 	$console->addCommands([
-		new \LogadApp\Queue\Console\WorkCommand()
+		new WorkCommand()
 	]);
 
     $console->run();
 
 } catch (Exception $e) {
-    print($e->getMessage());
+    print($e->getMessage() . PHP_EOL);
 }
