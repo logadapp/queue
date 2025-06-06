@@ -4,20 +4,16 @@ declare(strict_types=1);
 
 namespace LogadApp\Queue;
 
-class Job
+use Exception;
+
+abstract class Job
 {
 	public string $id;
-
-	/**
-	 * The name of the queue the job should be sent to.
-	 *
-	 * @var string
-	 */
 	protected string $queue = 'default';
 
-	// protected int $tries = 3;
-	// private int $retryAfter = 100;
-
+	protected int $tries = 0; // no retries unless set
+	protected int $attempts = 0;
+	protected int $retryAfter = 60;
 
 	public static function dispatch(...$params): void
 	{
@@ -25,32 +21,48 @@ class Job
 		Queue::add($job->queue, $job);
 	}
 
-	public function process(): void
+	final public function process(): void
 	{
 		try {
 			$this->handle();
-		} catch (\Exception $e) {
-			/*if ($this->tries > 0) {
-				$this->retry($this->retryAfter);
+			Queue::delete($this->queue, $this);
+		} catch (Exception $e) {
+			$this->attempts++;
+			
+			if ($this->attempts < $this->tries) {
+				$this->retry();
 			} else {
-				$this->fail();
-			}*/
-			$this->fail();
+				$this->failure($e);
+				Queue::delete($this->queue, $this);
+			}
 		}
 	}
 
-	/**
-	 * Retry the job after a delay.
-	 *
-	 * @return void
-	 */
-	protected function retry(): void
+	final public function getId(): string
+	{
+		return $this->id ?? '';
+	}
+
+	final public function getAttempts(): int
+	{
+		return $this->attempts;
+	}
+
+	final public function setId(string $id): self
+	{
+		$this->id = $id;
+		return $this;
+	}
+
+	private function retry(): void
 	{
 		Queue::retry($this->queue, $this);
 	}
 
-	protected function fail(): void
+	final protected function failure(Exception $exception): void
 	{
-		//
+		error_log("Job failed: " . $exception->getMessage());
 	}
+
+	abstract protected function handle(): void;
 }
