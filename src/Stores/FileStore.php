@@ -62,11 +62,9 @@ final class FileStore implements StoreInterface
 
 	private function getFilePath(string $queue): string
 	{
-		$file = $this->storagePath . '/' . $queue . '.queue';
+		$file = $this->storagePath . '/LogadApp.' . $queue . '.queue';
 
-		if (!file_exists($file)) {
-			file_put_contents($file, '');
-		}
+		if (!file_exists($file)) file_put_contents($file, '');
 
 		return $file;
 	}
