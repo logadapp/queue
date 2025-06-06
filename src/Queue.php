@@ -4,58 +4,75 @@ declare(strict_types=1);
 
 namespace LogadApp\Queue;
 
+use Exception;
+use LogadApp\Queue\Contracts\StoreInterface;
 use LogadApp\Queue\Stores\FileStore;
+use RuntimeException;
 
 class Queue
 {
-	private static StoreInterface $store;
+	private static ?StoreInterface $store = null;
 
-	/**
-	 * Set your own store implementation.
-	 *
-	 * @param StoreInterface $store
-	 * @return void
-	 */
 	public static function useStore(StoreInterface $store): void
 	{
 		static::$store = $store;
 	}
 
-	/**
-	 * Use user-defined store or the default FileStore.
-	 * @return StoreInterface
-	 */
 	private static function getStore(): StoreInterface
 	{
-		if (!static::$store) {
-			static::$store = new FileStore('./tmp/jobs');
+		if (!isset(static::$store)) {
+			static::$store = new FileStore();
 		}
 
 		return static::$store;
 	}
 
-	public static function add(string $queue, Job $job): void
+	public static function add(string $queue, Job $job): string
 	{
-		static::getStore()->add($queue, serialize($job));
+		$id = static::getStore()->add($queue, serialize($job));
+		$job->setId($id);
+		return $id;
 	}
 
 	public static function next(string $queue): ?Job
 	{
 		$job = static::getStore()->next($queue);
+		
 		if (!$job) return null;
 
-		$job = unserialize($job['payload']);
-		return $job['job'];
+		try {
+			$jobObject = unserialize($job['payload']);
+			
+			if (!$jobObject instanceof Job) {
+				throw new RuntimeException('Invalid job payload');
+			}
+			
+			$jobObject->setId($job['id']);
+
+			return $jobObject;
+		} catch (Exception $e) {
+			error_log("Failed to unserialize job: " . $e->getMessage());
+
+			static::getStore()->delete($queue, $job['id']);
+		}
+
+		return null;
 	}
 
 	public static function retry(string $queue, Job $job): void
 	{
-		// For simplicity, just add the job back to the queue
-		static::getStore()->retry($queue, $job);
+		$newId = static::getStore()->retry($queue, serialize($job));
+		$job->setId($newId);
 	}
 
 	public static function delete(string $queue, Job $job): void
 	{
 		static::getStore()->delete($queue, $job->getId());
+	}
+
+	// list jos for debug
+	public static function list(string $queue = 'default'): array
+	{
+		return static::getStore()->listJobs($queue);
 	}
 }
