@@ -1,4 +1,4 @@
-# LogadApp Queue System - Coming Soon
+# LogadApp\Queue - Coming Soon
 
 A lightweight (low-budget), queue system for PHP applications.
 
@@ -6,6 +6,7 @@ A lightweight (low-budget), queue system for PHP applications.
 1. Because I can.
 2. I was working on some vanilla php projects and sometimes needed to create cron jobs for each operation I wanted to run in the background. But I'd have to create a dedicated file to run the job, add a new entry in crontab..... 
 
+Checkout other projects under logadapp 😊
 ## Features
 
 
