@@ -4,20 +4,21 @@ declare(strict_types=1);
 
 namespace LogadApp\Queue\Stores;
 
-use LogadApp\Queue\Job;
-use LogadApp\Queue\StoreInterface;
+use Exception;
+use LogadApp\Queue\Contracts\StoreInterface;
 
 final class FileStore implements StoreInterface
 {
+	/**
+	 * @throws Exception
+	 */
 	public function __construct(
-		private readonly string $storagePath,
-		bool $autoCreate = true
+		private ?string $storagePath = null
 	) {
-		// Ensure the storage directory exists
-		if (!is_dir($this->storagePath) && $autoCreate) {
-			mkdir($this->storagePath, 0755, true);
-		} else {
-			throw new \Exception('Storage path does not exist');
+		if ($this->storagePath && !is_dir($this->storagePath)) {
+			throw new Exception('Storage path does not exist');
+		} elseif (!$this->storagePath) {
+			$this->storagePath = sys_get_temp_dir();
 		}
 	}
 
