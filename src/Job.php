@@ -17,8 +17,12 @@ abstract class Job
 
 	public static function dispatch(...$params): void
 	{
-		$job = new static(...$params);
-		Queue::add($job->queue, $job);
+		(new static(...$params))->dispatchSelf();
+	}
+
+	final public function dispatchSelf(): void
+	{
+		Queue::add($this->queue, $this);
 	}
 
 	final public function process(): void

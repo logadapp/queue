@@ -13,16 +13,21 @@ use LogadApp\Queue\Examples\Jobs\NewUserJob;
 // Queue::useStore($fileStore);
 
 // dispatch a job
-NewUserJob::dispatch("Michael", "test@test.com");
+NewUserJob::dispatch("test@test.com", "Michael");
 
 echo "job dispatched successfully!\n";
 
 // Dispatch multiple jobs in a loop
 for ($i = 1; $i <= 5; $i++) {
-	NewUserJob::dispatch("Michael-{$i}", "test@test.com");
-    
+	$job = new NewUserJob(
+		email: "explicit-{$i}@test.com",
+		firstName: "Explicit {$i}"
+	);
+	$job->dispatchSelf();
+
     echo "Dispatched #{$i}\n";
 }
+
 
 var_dump(\LogadApp\Queue\Queue::list());
 

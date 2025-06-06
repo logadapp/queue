@@ -56,6 +56,13 @@ SendEmailJob::dispatch(
     'Welcome!',
     'Thanks for signing up.'
 ));
+
+// extra parenthesis because 8.5 is not out yet
+(new SendEmailJob(
+  recipient: "explicit-{$i}@test.com", 
+  subject: "Explicit {$i}",
+  content: "HII"
+))->dispatchSelf();
 ```
 
 ### Processing Jobs
