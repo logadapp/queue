@@ -10,7 +10,8 @@
     },
     "autoload": {
         "psr-4": {
-            "LogadApp\\Queue\\": "src/"
+            "LogadApp\\Queue\\": "src/",
+            "LogadApp\\Queue\\Examples\\": "examples/"
         }
     },
     "autoload-dev": {
