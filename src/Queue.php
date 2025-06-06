@@ -9,6 +9,11 @@ use LogadApp\Queue\Contracts\StoreInterface;
 use LogadApp\Queue\Stores\FileStore;
 use RuntimeException;
 
+/**
+ * @todo Remove "delete", should update the job status instead
+ * @todo Retry shouldn't delete the job but reset it and push it again
+ * @todo Update the job fail reason along with failure
+ */
 class Queue
 {
 	private static ?StoreInterface $store = null;
