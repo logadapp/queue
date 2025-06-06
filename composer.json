@@ -10,18 +10,18 @@
     },
     "autoload": {
         "psr-4": {
-            "LogadApp\\Queue\\": "src/",
-            "LogadApp\\Queue\\Examples\\": "examples/"
+            "LogadApp\\Queue\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "LogadApp\\Queue\\Tests\\": "tests/"
+            "LogadApp\\Queue\\Tests\\": "tests/",
+            "LogadApp\\Queue\\Examples\\": "examples/"
         }
     },
     "authors": [
         {
-            "name": "Michael A.",
+            "name": "Michael Arawole",
             "email": "michael@logad.net"
         }
     ],
